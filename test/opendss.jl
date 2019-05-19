@@ -96,7 +96,7 @@
 
         @test tppm["name"] == "test2"
 
-        @test length(tppm) == 19 # 1 more entry for transformer dicts
+        @test length(tppm) == 20 # keep track of sourcebus
         @test length(dss) == 12
 
         # 26 buses and not 12, because of internal transformer buses;
@@ -369,5 +369,15 @@
 
         @test all(sol["solution"]["gen"]["2"]["pg"][2:3] .== 0.0)
         @test all(sol["solution"]["gen"]["2"]["qg"][2:3] .== 0.0)
+    end
+
+    @testset "json parse" begin
+        tppm = TPPMs.parse_file("../test/data/opendss/case3_balanced.dss")
+
+        io = PipeBuffer()
+        JSON.print(io, tppm)
+        tppm_json_file = TPPMs.parse_file(io)
+
+        @test tppm == tppm_json_file
     end
 end
